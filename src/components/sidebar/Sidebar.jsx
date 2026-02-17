@@ -115,7 +115,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               { name: "Specials", path: "/special" },
               {
                 name: "Join Telegram",
-                path: "https://t.me/zenime_discussion",
+                path: "https://t.me/afabra_world_anime",
               },
             ].map((item, index) => (
               <li
