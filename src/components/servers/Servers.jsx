@@ -20,35 +20,36 @@ function Servers({
   const rawServers = servers?.filter((server) => server.type === "raw") || [];
 
   useEffect(() => {
+    if (!servers || servers.length === 0) return;
+
     const savedServerName = localStorage.getItem("server_name");
+    const savedServerType = localStorage.getItem("server_type");
 
-    if (savedServerName) {
-      const matchingServer = servers?.find(
-        (server) => server.serverName === savedServerName
-      );
+    const matchingServer =
+      servers.find(
+        (server) =>
+          server.serverName === savedServerName &&
+          server.type === savedServerType
+      ) ||
+      servers.find((server) => server.serverName === savedServerName) ||
+      servers[0];
 
-      if (matchingServer) {
-        setActiveServerId(matchingServer.data_id);
-      } else if (servers && servers.length > 0) {
-        setActiveServerId(servers[0].data_id);
-      }
-    } else if (servers && servers.length > 0) {
-      setActiveServerId(servers[0].data_id);
-    }
-  }, [servers]);
+    setActiveServerId(matchingServer.data_id);
+  }, [servers, setActiveServerId]);
 
   const handleServerSelect = (server) => {
     setActiveServerId(server.data_id);
     localStorage.setItem("server_name", server.serverName);
     localStorage.setItem("server_type", server.type);
   };
+
   return (
     <div className="relative bg-[#11101A] p-4 w-full min-h-[100px] flex justify-center items-center max-[1200px]:bg-[#14151A]">
       {serverLoading ? (
         <div className="w-full h-full rounded-lg flex justify-center items-center max-[600px]:rounded-none">
           <BouncingLoader />
         </div>
-      ) : servers ? (
+      ) : servers && servers.length > 0 ? (
         <div className="w-full h-full rounded-lg grid grid-cols-[minmax(0,30%),minmax(0,70%)] overflow-hidden max-[800px]:grid-cols-[minmax(0,40%),minmax(0,60%)] max-[600px]:flex max-[600px]:flex-col max-[600px]:rounded-none">
           <div className="h-full bg-[#ffbade] px-6 text-black flex flex-col justify-center items-center gap-y-2 max-[600px]:bg-transparent max-[600px]:h-1/2 max-[600px]:text-white max-[600px]:mb-4">
             <p className="text-center leading-5 font-medium text-[14px]">
@@ -62,6 +63,7 @@ function Servers({
               beside.
             </p>
           </div>
+
           <div className="bg-[#201F31] flex flex-col max-[600px]:h-full">
             {rawServers.length > 0 && (
               <div
@@ -78,10 +80,11 @@ function Servers({
                   />
                   <p className="font-bold text-[14px]">RAW:</p>
                 </div>
+
                 <div className="flex gap-x-[7px] ml-8 flex-wrap">
-                  {rawServers.map((item, index) => (
+                  {rawServers.map((item) => (
                     <div
-                      key={index}
+                      key={`${item.type}-${item.data_id}`}
                       className={`px-6 py-[5px] rounded-lg cursor-pointer ${
                         activeServerId === item?.data_id
                           ? "bg-[#ffbade] text-black"
@@ -97,6 +100,7 @@ function Servers({
                 </div>
               </div>
             )}
+
             {subServers.length > 0 && (
               <div
                 className={`servers px-2 flex items-center flex-wrap ml-2 max-[600px]:py-2 ${
@@ -110,10 +114,11 @@ function Servers({
                   />
                   <p className="font-bold text-[14px]">SUB:</p>
                 </div>
+
                 <div className="flex gap-x-[7px] ml-8 flex-wrap">
-                  {subServers.map((item, index) => (
+                  {subServers.map((item) => (
                     <div
-                      key={index}
+                      key={`${item.type}-${item.data_id}`}
                       className={`px-6 py-[5px] rounded-lg cursor-pointer ${
                         activeServerId === item?.data_id
                           ? "bg-[#ffbade] text-black"
@@ -129,10 +134,11 @@ function Servers({
                 </div>
               </div>
             )}
+
             {dubServers.length > 0 && (
               <div
                 className={`servers px-2 flex items-center flex-wrap ml-2 max-[600px]:py-2 ${
-                  subServers.length === 0 ? "h-1/2 " : "h-full"
+                  subServers.length === 0 ? "h-1/2" : "h-full"
                 }`}
               >
                 <div className="flex items-center gap-x-3">
@@ -142,10 +148,11 @@ function Servers({
                   />
                   <p className="font-bold text-[14px]">DUB:</p>
                 </div>
+
                 <div className="flex gap-x-[7px] ml-8 flex-wrap">
-                  {dubServers.map((item, index) => (
+                  {dubServers.map((item) => (
                     <div
-                      key={index}
+                      key={`${item.type}-${item.data_id}`}
                       className={`px-6 py-[5px] rounded-lg cursor-pointer ${
                         activeServerId === item?.data_id
                           ? "bg-[#ffbade] text-black"
