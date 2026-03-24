@@ -19,21 +19,59 @@ function Servers({
   const dubServers = servers?.filter((server) => server.type === "dub") || [];
   const rawServers = servers?.filter((server) => server.type === "raw") || [];
 
+  // 🔥 Format server names (UI only)
+  const formatServerName = (name) => {
+    switch (name) {
+      case "VidSrc":
+        return "HD-1";
+      case "MegaCloud":
+        return "HD-2";
+      case "T-Cloud":
+        return "HD-3";
+      default:
+        return name;
+    }
+  };
+
   useEffect(() => {
+    if (!servers || servers.length === 0) return;
+
     const savedServerName = localStorage.getItem("server_name");
+    const savedType = localStorage.getItem("server_type");
 
-    if (savedServerName) {
-      const matchingServer = servers?.find(
-        (server) => server.serverName === savedServerName
+    // 🔥 Priority order
+    const priority = ["VidSrc", "MegaCloud", "T-Cloud"];
+
+    let selectedServer = null;
+
+    // 1️⃣ Try saved server (same type)
+    if (savedServerName && savedType) {
+      selectedServer = servers.find(
+        (s) =>
+          s.serverName === savedServerName &&
+          s.type === savedType
       );
+    }
 
-      if (matchingServer) {
-        setActiveServerId(matchingServer.data_id);
-      } else if (servers && servers.length > 0) {
-        setActiveServerId(servers[0].data_id);
-      }
-    } else if (servers && servers.length > 0) {
-      setActiveServerId(servers[0].data_id);
+    // 2️⃣ If not found → pick best SUB first
+    if (!selectedServer) {
+      selectedServer =
+        servers
+          .filter((s) => s.type === "sub")
+          .sort(
+            (a, b) =>
+              priority.indexOf(a.serverName) -
+              priority.indexOf(b.serverName)
+          )[0] ||
+        servers.sort(
+          (a, b) =>
+            priority.indexOf(a.serverName) -
+            priority.indexOf(b.serverName)
+        )[0];
+    }
+
+    if (selectedServer) {
+      setActiveServerId(selectedServer.data_id);
     }
   }, [servers]);
 
@@ -42,6 +80,7 @@ function Servers({
     localStorage.setItem("server_name", server.serverName);
     localStorage.setItem("server_type", server.type);
   };
+
   return (
     <div className="relative bg-[#11101A] p-4 w-full min-h-[100px] flex justify-center items-center max-[1200px]:bg-[#14151A]">
       {serverLoading ? (
@@ -62,15 +101,11 @@ function Servers({
               beside.
             </p>
           </div>
+
           <div className="bg-[#201F31] flex flex-col max-[600px]:h-full">
+            {/* RAW */}
             {rawServers.length > 0 && (
-              <div
-                className={`servers px-2 flex items-center flex-wrap ml-2 max-[600px]:py-2 ${
-                  dubServers.length === 0 || subServers.length === 0
-                    ? "h-1/2"
-                    : "h-full"
-                }`}
-              >
+              <div className="servers px-2 flex items-center flex-wrap ml-2 max-[600px]:py-2">
                 <div className="flex items-center gap-x-2">
                   <FontAwesomeIcon
                     icon={faFile}
@@ -90,19 +125,86 @@ function Servers({
                       onClick={() => handleServerSelect(item)}
                     >
                       <p className="text-[13px] font-semibold">
-                        {item.serverName}
+                        {formatServerName(item.serverName)}
                       </p>
                     </div>
                   ))}
                 </div>
               </div>
             )}
+
+            {/* SUB */}
             {subServers.length > 0 && (
-              <div
-                className={`servers px-2 flex items-center flex-wrap ml-2 max-[600px]:py-2 ${
-                  dubServers.length === 0 ? "h-1/2" : "h-full"
-                }`}
-              >
+              <div className="servers px-2 flex items-center flex-wrap ml-2 max-[600px]:py-2">
+                <div className="flex items-center gap-x-2">
+                  <FontAwesomeIcon
+                    icon={faClosedCaptioning}
+                    className="text-[#ffbade] text-[13px]"
+                  />
+                  <p className="font-bold text-[14px]">SUB:</p>
+                </div>
+                <div className="flex gap-x-[7px] ml-8 flex-wrap">
+                  {subServers.map((item, index) => (
+                    <div
+                      key={index}
+                      className={`px-6 py-[5px] rounded-lg cursor-pointer ${
+                        activeServerId === item?.data_id
+                          ? "bg-[#ffbade] text-black"
+                          : "bg-[#373646] text-white"
+                      } max-[700px]:px-3`}
+                      onClick={() => handleServerSelect(item)}
+                    >
+                      <p className="text-[13px] font-semibold">
+                        {formatServerName(item.serverName)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* DUB */}
+            {dubServers.length > 0 && (
+              <div className="servers px-2 flex items-center flex-wrap ml-2 max-[600px]:py-2">
+                <div className="flex items-center gap-x-3">
+                  <FontAwesomeIcon
+                    icon={faMicrophone}
+                    className="text-[#ffbade] text-[13px]"
+                  />
+                  <p className="font-bold text-[14px]">DUB:</p>
+                </div>
+                <div className="flex gap-x-[7px] ml-8 flex-wrap">
+                  {dubServers.map((item, index) => (
+                    <div
+                      key={index}
+                      className={`px-6 py-[5px] rounded-lg cursor-pointer ${
+                        activeServerId === item?.data_id
+                          ? "bg-[#ffbade] text-black"
+                          : "bg-[#373646] text-white"
+                      } max-[700px]:px-3`}
+                      onClick={() => handleServerSelect(item)}
+                    >
+                      <p className="text-[13px] font-semibold">
+                        {formatServerName(item.serverName)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <p className="text-center font-medium text-[15px] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none">
+          Could not load servers <br />
+          Either reload or try again after sometime
+        </p>
+      )}
+    </div>
+  );
+}
+
+export default Servers;              >
                 <div className="flex items-center gap-x-2">
                   <FontAwesomeIcon
                     icon={faClosedCaptioning}
