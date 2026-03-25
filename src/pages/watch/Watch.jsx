@@ -110,7 +110,7 @@ export default function Watch() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [episodeId, animeId, navigate, episodes]);
 
-  useEffect(() => {
+useEffect(() => {
   const title =
     language === "EN"
       ? animeInfo?.title
