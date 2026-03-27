@@ -22,35 +22,35 @@ import SidecardLoader from "@/src/components/Loader/Sidecard.loader";
 import Voiceactor from "@/src/components/voiceactor/Voiceactor";
 import Watchcontrols from "@/src/components/watchcontrols/Watchcontrols";
 import useWatchControl from "@/src/hooks/useWatchControl";
+import DisqusComments from "@/src/components/DisqusComments";
 
 function Tag({ bgColor, index, icon, text }) {
-    return (
-      <div
-        className={`flex space-x-1 justify-center items-center px-[4px] py-[1px] text-black font-semibold text-[13px] ${
-          index === 0 ? "rounded-l-[4px]" : "rounded-none"
-        }`}
-        style={{ backgroundColor: bgColor }}
-      >
-        {icon && <FontAwesomeIcon icon={icon} className="text-[12px]" />}
-        <p className="text-[12px]">{text}</p>
-      </div>
-    );
-  }
-
+  return (
+    <div
+      className={`flex space-x-1 justify-center items-center px-[4px] py-[1px] text-black font-semibold text-[13px] ${
+        index === 0 ? "rounded-l-[4px]" : "rounded-none"
+      }`}
+      style={{ backgroundColor: bgColor }}
+    >
+      {icon && <FontAwesomeIcon icon={icon} className="text-[12px]" />}
+      <p className="text-[12px]">{text}</p>
+    </div>
+  );
+}
 
 export default function Watch() {
   const location = useLocation();
   const navigate = useNavigate();
   const { id: animeId } = useParams();
   const queryParams = new URLSearchParams(location.search);
-  let initialEpisodeId = queryParams.get("ep");
+  const initialEpisodeId = queryParams.get("ep");
   const [tags, setTags] = useState([]);
   const { language } = useLanguage();
   const { homeInfo } = useHomeInfo();
   const isFirstSet = useRef(true);
   const [showNextEpisodeSchedule, setShowNextEpisodeSchedule] = useState(true);
+
   const {
-    // error,
     buffering,
     streamInfo,
     animeInfo,
@@ -74,6 +74,7 @@ export default function Watch() {
     servers,
     serverLoading,
   } = useWatch(animeId, initialEpisodeId);
+
   const {
     autoPlay,
     setAutoPlay,
@@ -85,13 +86,12 @@ export default function Watch() {
 
   useEffect(() => {
     if (!episodes || episodes.length === 0) return;
-    
-    const isValidEpisode = episodes.some(ep => {
-      const epNumber = ep.id.split('ep=')[1];
-      return epNumber === episodeId; 
+
+    const isValidEpisode = episodes.some((ep) => {
+      const epNumber = ep.id.split("ep=")[1];
+      return epNumber === episodeId;
     });
-    
-    // If missing or invalid episodeId, fallback to first
+
     if (!episodeId || !isValidEpisode) {
       const fallbackId = episodes[0].id.match(/ep=(\d+)/)?.[1];
       if (fallbackId && fallbackId !== episodeId) {
@@ -99,7 +99,7 @@ export default function Watch() {
       }
       return;
     }
-  
+
     const newUrl = `/watch/${animeId}?ep=${episodeId}`;
     if (isFirstSet.current) {
       navigate(newUrl, { replace: true });
@@ -107,50 +107,27 @@ export default function Watch() {
     } else {
       navigate(newUrl);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [episodeId, animeId, navigate, episodes]);
 
-useEffect(() => {
-  const title =
-    language === "EN"
-      ? animeInfo?.title
-      : animeInfo?.japanese_title || animeInfo?.title;
+  useEffect(() => {
+    const title =
+      language === "EN"
+        ? animeInfo?.title
+        : animeInfo?.japanese_title || animeInfo?.title;
 
-  if (title) {
-    document.title = `Watch ${title} English Sub/Dub online Free on ${website_name}`;
-  } else {
-    document.title = `${website_name} | Free anime streaming platform`;
-  }
-}, [animeInfo, language]);
+    if (title) {
+      document.title = `Watch ${title} English Sub/Dub online Free on ${website_name}`;
+    } else {
+      document.title = `${website_name} | Free anime streaming platform`;
+    }
+  }, [animeInfo, language]);
 
-  // Redirect if no episodes
   useEffect(() => {
     if (totalEpisodes !== null && totalEpisodes === 0) {
       navigate(`/${animeId}`);
     }
   }, [streamInfo, episodeId, animeId, totalEpisodes, navigate]);
-
-  // useEffect(() => {
-  //   const adjustHeight = () => {
-  //     if (window.innerWidth > 1200) {
-  //       const player = document.querySelector(".player");
-  //       const episodes = document.querySelector(".episodes");
-  //       if (player && episodes) {
-  //         episodes.style.height = `${player.clientHeight}px`;
-  //       }
-  //     } else {
-  //       const episodes = document.querySelector(".episodes");
-  //       if (episodes) {
-  //         episodes.style.height = "auto";
-  //       }
-  //     }
-  //   };
-  //   adjustHeight();
-  //   window.addEventListener("resize", adjustHeight);
-  //   return () => {
-  //     window.removeEventListener("resize", adjustHeight);
-  //   };
-  // },[]);
 
   useEffect(() => {
     let ro = null;
@@ -185,7 +162,11 @@ useEffect(() => {
         } else {
           window.addEventListener("resize", applyHeight);
           mo = new MutationObserver(applyHeight);
-          mo.observe(playerEl(), { attributes: true, childList: true, subtree: true });
+          mo.observe(playerEl(), {
+            attributes: true,
+            childList: true,
+            subtree: true,
+          });
         }
       } else {
         const t = setTimeout(() => {
@@ -238,6 +219,15 @@ useEffect(() => {
       },
     ]);
   }, [animeId, animeInfo]);
+
+  const disqusTitle = `${
+    language === "EN"
+      ? animeInfo?.title
+      : animeInfo?.japanese_title || animeInfo?.title || "Anime"
+  } Episode ${episodeId || activeEpisodeNum || ""}`;
+
+  const disqusIdentifier = `${animeId}-ep-${episodeId || activeEpisodeNum || "1"}`;
+
   return (
     <div className="w-full h-fit flex flex-col justify-center items-center relative">
       <div className="w-full relative max-[1400px]:px-[30px] max-[1200px]:px-[80px] max-[1024px]:px-0">
@@ -250,7 +240,7 @@ useEffect(() => {
           alt={`${animeInfo?.title} Poster`}
           className="absolute inset-0 w-full h-full object-cover filter grayscale z-[-900]"
         />
-        <div className="absolute inset-0 bg-[#3a3948] bg-opacity-80 backdrop-blur-md z-[-800]"></div>
+        <div className="absolute inset-0 bg-[#3a3948] bg-opacity-80 backdrop-blur-md z-[-800]" />
         <div className="relative z-10 px-4 pb-[50px] grid grid-cols-[minmax(0,75%),minmax(0,25%)] w-full h-full mt-[128px] max-[1400px]:flex max-[1400px]:flex-col max-[1200px]:mt-[64px] max-[1024px]:px-0 max-md:mt-[50px]">
           {animeInfo && (
             <ul className="flex absolute left-4 top-[-40px] gap-x-2 items-center w-fit max-[1200px]:hidden">
@@ -265,7 +255,7 @@ useEffect(() => {
                   >
                     {text}
                   </Link>
-                  <div className="dot mt-[1px] bg-white"></div>
+                  <div className="dot mt-[1px] bg-white" />
                 </li>
               ))}
               <p className="font-light text-[15px] text-gray-300 line-clamp-1 max-[575px]:leading-5">
@@ -276,6 +266,7 @@ useEffect(() => {
               </p>
             </ul>
           )}
+
           <div className="flex w-full min-h-fit max-[1200px]:flex-col-reverse">
             <div className="episodes w-[35%] bg-[#191826] flex justify-center items-center max-[1400px]:w-[380px] max-[1200px]:w-full max-[1200px]:h-full max-[1200px]:min-h-[100px]">
               {!episodes ? (
@@ -289,6 +280,7 @@ useEffect(() => {
                 />
               )}
             </div>
+
             <div className="player w-full h-fit bg-black flex flex-col">
               <div className="w-full relative h-[480px] max-[1400px]:h-[40vw] max-[1200px]:h-[48vw] max-[1024px]:h-[58vw] max-[600px]:h-[65vw]">
                 {!buffering ? (
@@ -313,6 +305,7 @@ useEffect(() => {
                     <BouncingLoader />
                   </div>
                 )}
+
                 <p className="text-center underline font-medium text-[15px] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
                   {!buffering && !streamInfo ? (
                     servers ? (
@@ -346,6 +339,7 @@ useEffect(() => {
                   onButtonClick={(id) => setEpisodeId(id)}
                 />
               )}
+
               <Servers
                 servers={servers}
                 activeEpisodeNum={activeEpisodeNum}
@@ -353,6 +347,7 @@ useEffect(() => {
                 setActiveServerId={setActiveServerId}
                 serverLoading={serverLoading}
               />
+
               {seasons?.length > 0 && (
                 <div className="flex flex-col gap-y-2 bg-[#11101A] p-4">
                   <h1 className="w-fit text-lg max-[478px]:text-[18px] font-semibold">
@@ -378,7 +373,7 @@ useEffect(() => {
                         >
                           {season.season}
                         </p>
-                        <div className="absolute inset-0 z-10 bg-[url('https://i.postimg.cc/pVGY6RXd/thumb.png')] bg-repeat"></div>
+                        <div className="absolute inset-0 z-10 bg-[url('https://i.postimg.cc/pVGY6RXd/thumb.png')] bg-repeat" />
                         <img
                           src={`${season.season_poster}`}
                           alt=""
@@ -389,6 +384,7 @@ useEffect(() => {
                   </div>
                 </div>
               )}
+
               {nextEpisodeSchedule?.nextEpisodeSchedule &&
                 showNextEpisodeSchedule && (
                   <div className="p-4">
@@ -424,6 +420,7 @@ useEffect(() => {
                 )}
             </div>
           </div>
+
           <div className="flex flex-col gap-y-4 items-start ml-8 max-[1400px]:ml-0 max-[1400px]:mt-10 max-[1400px]:flex-row max-[1400px]:gap-x-6 max-[1024px]:px-[30px] max-[1024px]:mt-8 max-[500px]:mt-4 max-[500px]:px-4">
             {animeInfo && animeInfo?.poster ? (
               <img
@@ -434,6 +431,7 @@ useEffect(() => {
             ) : (
               <Skeleton className="w-[100px] h-[150px] rounded-none" />
             )}
+
             <div className="flex flex-col gap-y-4 justify-start">
               {animeInfo && animeInfo?.title ? (
                 <p className="text-[26px] font-medium leading-6 max-[500px]:text-[18px]">
@@ -442,6 +440,7 @@ useEffect(() => {
               ) : (
                 <Skeleton className="w-[170px] h-[20px] rounded-xl" />
               )}
+
               <div className="flex flex-wrap w-fit gap-x-[2px] gap-y-[3px]">
                 {animeInfo ? (
                   tags.map(
@@ -459,6 +458,7 @@ useEffect(() => {
                 ) : (
                   <Skeleton className="w-[70px] h-[20px] rounded-xl" />
                 )}
+
                 <div className="flex w-fit items-center ml-1">
                   {[
                     animeInfo?.animeInfo?.tvInfo?.showType,
@@ -470,13 +470,14 @@ useEffect(() => {
                           key={index}
                           className="px-1 h-fit flex items-center gap-x-2 w-fit"
                         >
-                          <div className="dot mt-[2px]"></div>
+                          <div className="dot mt-[2px]" />
                           <p className="text-[14px]">{item}</p>
                         </div>
                       )
                   )}
                 </div>
               </div>
+
               {animeInfo ? (
                 animeInfo?.animeInfo?.Overview && (
                   <div className="max-h-[150px] overflow-hidden">
@@ -492,7 +493,9 @@ useEffect(() => {
                                 )}...`}
                             <span
                               className="text-[13px] font-bold hover:cursor-pointer"
-                              onClick={() => setIsFullOverview(!isFullOverview)}
+                              onClick={() =>
+                                setIsFullOverview(!isFullOverview)
+                              }
                             >
                               {isFullOverview ? "- Less" : "+ More"}
                             </span>
@@ -512,6 +515,7 @@ useEffect(() => {
                   <Skeleton className="w-[80px] h-[10px] rounded-xl" />
                 </div>
               )}
+
               <p className="text-[14px] max-[575px]:hidden">
                 {`${website_name} is the best site to watch `}
                 <span className="font-bold">
@@ -523,6 +527,7 @@ useEffect(() => {
                 </span>
                 {` DUB in HD quality.`}
               </p>
+
               <Link
                 to={`/${animeId}`}
                 className="w-fit text-[13px] bg-white rounded-[12px] px-[10px] py-1 text-black"
@@ -533,6 +538,7 @@ useEffect(() => {
           </div>
         </div>
       </div>
+
       <div className="w-full flex gap-x-4 items-center bg-[#191826] p-5 max-[575px]:px-3 max-[320px]:hidden">
         <img
           src="https://i.postimg.cc/d34WWyNQ/share-icon.gif"
@@ -544,11 +550,20 @@ useEffect(() => {
           <p className="text-[16px] text-white">to your friends</p>
         </div>
       </div>
+
+      <div className="w-full px-4 mt-6">
+        <DisqusComments
+          identifier={disqusIdentifier}
+          title={disqusTitle}
+        />
+      </div>
+
       <div className="w-full px-4 grid grid-cols-[minmax(0,75%),minmax(0,25%)] gap-x-6 max-[1200px]:flex flex-col">
         <div className="mt-[15px] flex flex-col gap-y-7">
           {animeInfo?.charactersVoiceActors.length > 0 && (
             <Voiceactor animeInfo={animeInfo} className="!mt-0" />
           )}
+
           {animeInfo?.recommended_data.length > 0 ? (
             <CategoryCard
               label="Recommended for you"
@@ -560,6 +575,7 @@ useEffect(() => {
             <CategoryCardLoader className={"mt-[15px]"} />
           )}
         </div>
+
         <div>
           {animeInfo && animeInfo.related_data ? (
             <Sidecard
@@ -570,6 +586,7 @@ useEffect(() => {
           ) : (
             <SidecardLoader className={"mt-[25px]"} />
           )}
+
           {homeInfo && homeInfo.most_popular && (
             <Sidecard
               label="Most Popular"
