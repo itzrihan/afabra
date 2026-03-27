@@ -21,7 +21,7 @@ export default function DisqusComments({ identifier, title }) {
       };
 
       const script = document.createElement("script");
-      script.src = "https://YOUR_DISQUS_SHORTNAME.disqus.com/embed.js";
+      script.src = "https://afabra-fun.disqus.com/embed.js";
       script.setAttribute("data-timestamp", +new Date());
       script.async = true;
       document.body.appendChild(script);
