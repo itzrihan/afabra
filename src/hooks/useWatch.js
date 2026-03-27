@@ -7,6 +7,27 @@ import getNextEpisodeSchedule from "../utils/getNextEpisodeSchedule.utils";
 import getServers from "../utils/getServers.utils";
 import getStreamInfo from "../utils/getStreamInfo.utils";
 
+const SERVER_PRIORITY = {
+  megacloud: 1,
+  vidsrc: 2,
+};
+
+const sortServersByPriority = (list) => {
+  return [...list].sort((a, b) => {
+    const aName = String(a?.serverName || "").trim().toLowerCase();
+    const bName = String(b?.serverName || "").trim().toLowerCase();
+
+    const aPriority = SERVER_PRIORITY[aName] ?? 999;
+    const bPriority = SERVER_PRIORITY[bName] ?? 999;
+
+    if (aPriority !== bPriority) {
+      return aPriority - bPriority;
+    }
+
+    return aName.localeCompare(bName);
+  });
+};
+
 export const useWatch = (animeId, initialEpisodeId) => {
   const [error, setError] = useState(null);
   const [buffering, setBuffering] = useState(true);
@@ -137,15 +158,13 @@ export const useWatch = (animeId, initialEpisodeId) => {
 
         if (!mounted) return;
 
-        // Support both:
-        // 1) getServers() returns array directly
-        // 2) getServers() returns { success, results: [...] }
         const rawServers = Array.isArray(data) ? data : data?.results || [];
 
-        // No old hardcoded filtering here
-        const serversList = rawServers.filter(
+        const filteredServers = rawServers.filter(
           (server) => server?.serverName && server?.data_id && server?.type
         );
+
+        const serversList = sortServersByPriority(filteredServers);
 
         const savedServerName = localStorage.getItem("server_name");
         const savedServerType = localStorage.getItem("server_type");
@@ -220,9 +239,6 @@ export const useWatch = (animeId, initialEpisodeId) => {
           String(server.type).toLowerCase()
         );
 
-        // Support both:
-        // 1) { streamingLink: ... }
-        // 2) { results: { streamingLink: ... } }
         const streamingLink =
           data?.results?.streamingLink || data?.streamingLink || null;
 
