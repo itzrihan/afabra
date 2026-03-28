@@ -9,7 +9,7 @@ import Loader from "@/src/components/Loader/Loader.jsx";
 import Error from "@/src/components/error/Error.jsx";
 import { useHomeInfo } from "@/src/context/HomeInfoContext.jsx";
 import Schedule from "@/src/components/schedule/Schedule";
-import ContinueWatching from "@/src/components/continue/ContinueWatching";
+
 
 function Home() {
   const { homeInfo, homeInfoLoading, error } = useHomeInfo();
@@ -20,7 +20,7 @@ function Home() {
     <>
       <div className="px-4 w-full max-[1200px]:px-0">
         <Spotlight spotlights={homeInfo.spotlights} />
-        <ContinueWatching />
+      
         <Trending trending={homeInfo.trending} />
         <div className="mt-10 flex gap-6 max-[1200px]:px-4 max-[1200px]:grid max-[1200px]:grid-cols-2 max-[1200px]:mt-12 max-[1200px]:gap-y-10 max-[680px]:grid-cols-1">
           <Cart
