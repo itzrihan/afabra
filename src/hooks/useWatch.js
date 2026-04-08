@@ -8,6 +8,7 @@ import getServers from "../utils/getServers.utils";
 import getStreamInfo from "../utils/getStreamInfo.utils";
 
 const SERVER_PRIORITY = {
+  fast: 0, // Set Fast server to the highest priority
   megacloud: 1,
   vidsrc: 2,
 };
