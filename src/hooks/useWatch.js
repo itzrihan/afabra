@@ -338,21 +338,19 @@ export const useWatch = (animeId, initialEpisodeId) => {
 export const WatchPage = ({ animeId, initialEpisodeId }) => {
   const { streamUrl, error } = useWatch(animeId, initialEpisodeId);
 
-  return (
-    <div>
-      {error && <p>{error}</p>}
-      {streamUrl ? (
-        <iframe
-          src={streamUrl}
-          width="100%"
-          height="100%"
-          frameBorder="0"
-          scrolling="no"
-          allowFullScreen
-        />
-      ) : (
-        <p>Loading Fast Server...</p>
-      )}
-    </div>
+  return React.createElement(
+    "div",
+    null,
+    error ? React.createElement("p", null, error) : null,
+    streamUrl
+      ? React.createElement("iframe", {
+          src: streamUrl,
+          width: "100%",
+          height: "100%",
+          frameBorder: "0",
+          scrolling: "no",
+          allowFullScreen: true,
+        })
+      : React.createElement("p", null, "Loading Fast Server...")
   );
 };
