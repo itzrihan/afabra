@@ -34,9 +34,8 @@ const sortServersByPriority = (list) => {
 // Function to generate the Fast server URL
 const getFastServerUrl = (serverName, epId) => {
   if (serverName === "Fast") {
-    return `https://megaplay.buzz/stream/s-2/${epId}/sub`;
+    return `https://megaplay.buzz/stream/s-2/${epId}/sub`; // Embed Fast server URL here
   }
-  // Default to some other server URL logic, if needed
   return null;
 };
 
