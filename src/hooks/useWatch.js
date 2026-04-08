@@ -7,26 +7,37 @@ import getNextEpisodeSchedule from "../utils/getNextEpisodeSchedule.utils";
 import getServers from "../utils/getServers.utils";
 import getStreamInfo from "../utils/getStreamInfo.utils";
 
+// Priority for servers: 'Fast' is given priority 0, meaning it comes first
 const SERVER_PRIORITY = {
-  fast: 0, // Set Fast server to the highest priority
+  fast: 0,  // Fast server gets the highest priority
   megacloud: 1,
   vidsrc: 2,
 };
 
+// Function to sort the servers based on the priority
 const sortServersByPriority = (list) => {
   return [...list].sort((a, b) => {
     const aName = String(a?.serverName || "").trim().toLowerCase();
     const bName = String(b?.serverName || "").trim().toLowerCase();
 
-    const aPriority = SERVER_PRIORITY[aName] ?? 999;
+    const aPriority = SERVER_PRIORITY[aName] ?? 999; // Default to 999 if server is not in priority list
     const bPriority = SERVER_PRIORITY[bName] ?? 999;
 
     if (aPriority !== bPriority) {
-      return aPriority - bPriority;
+      return aPriority - bPriority; // Sort by priority
     }
 
-    return aName.localeCompare(bName);
+    return aName.localeCompare(bName); // If priorities are equal, fallback to alphabetical order
   });
+};
+
+// Function to generate the Fast server URL
+const getFastServerUrl = (serverName, epId) => {
+  if (serverName === "Fast") {
+    return `https://megaplay.buzz/stream/s-2/${epId}/sub`;
+  }
+  // Default to some other server URL logic, if needed
+  return null;
 };
 
 export const useWatch = (animeId, initialEpisodeId) => {
@@ -165,6 +176,7 @@ export const useWatch = (animeId, initialEpisodeId) => {
           (server) => server?.serverName && server?.data_id && server?.type
         );
 
+        // Sort servers based on priority
         const serversList = sortServersByPriority(filteredServers);
 
         const savedServerName = localStorage.getItem("server_name");
@@ -233,41 +245,49 @@ export const useWatch = (animeId, initialEpisodeId) => {
           return;
         }
 
-        const data = await getStreamInfo(
-          animeId,
-          episodeId,
-          String(server.serverName).toLowerCase(),
-          String(server.type).toLowerCase()
-        );
+        // Get the Fast server URL if the server is Fast
+        const fastServerUrl = getFastServerUrl(server.serverName, episodeId);
 
-        const streamingLink =
-          data?.results?.streamingLink || data?.streamingLink || null;
+        // If we have a Fast server URL, set it to the stream URL
+        if (fastServerUrl) {
+          setStreamUrl(fastServerUrl);
+        } else {
+          const data = await getStreamInfo(
+            animeId,
+            episodeId,
+            String(server.serverName).toLowerCase(),
+            String(server.type).toLowerCase()
+          );
 
-        setStreamInfo(data);
-        setStreamUrl(streamingLink?.link?.file || null);
-        setIntro(streamingLink?.intro || null);
-        setOutro(streamingLink?.outro || null);
+          const streamingLink =
+            data?.results?.streamingLink || data?.streamingLink || null;
 
-        const subtitles =
-          streamingLink?.tracks
-            ?.filter((track) => track.kind === "captions")
-            .map(({ file, label, kind, default: isDefault }) => ({
-              file,
-              label,
-              kind,
-              default: !!isDefault,
-            })) || [];
+          setStreamInfo(data);
+          setStreamUrl(streamingLink?.link?.file || null);
+          setIntro(streamingLink?.intro || null);
+          setOutro(streamingLink?.outro || null);
 
-        setSubtitles(subtitles);
+          const subtitles =
+            streamingLink?.tracks
+              ?.filter((track) => track.kind === "captions")
+              .map(({ file, label, kind, default: isDefault }) => ({
+                file,
+                label,
+                kind,
+                default: !!isDefault,
+              })) || [];
 
-        const thumbnailTrack = streamingLink?.tracks?.find(
-          (track) => track.kind === "thumbnails" && track.file
-        );
+          setSubtitles(subtitles);
 
-        setThumbnail(thumbnailTrack?.file || null);
+          const thumbnailTrack = streamingLink?.tracks?.find(
+            (track) => track.kind === "thumbnails" && track.file
+          );
 
-        if (!streamingLink?.link?.file) {
-          setError("Stream URL not found.");
+          setThumbnail(thumbnailTrack?.file || null);
+
+          if (!streamingLink?.link?.file) {
+            setError("Stream URL not found.");
+          }
         }
       } catch (err) {
         console.error("Error fetching stream info:", err);
@@ -311,4 +331,28 @@ export const useWatch = (animeId, initialEpisodeId) => {
     activeServerName,
     setActiveServerName,
   };
+};
+
+// Usage in the component
+
+export const WatchPage = ({ animeId, initialEpisodeId }) => {
+  const { streamUrl, error } = useWatch(animeId, initialEpisodeId);
+
+  return (
+    <div>
+      {error && <p>{error}</p>}
+      {streamUrl ? (
+        <iframe
+          src={streamUrl}
+          width="100%"
+          height="100%"
+          frameBorder="0"
+          scrolling="no"
+          allowFullScreen
+        />
+      ) : (
+        <p>Loading Fast Server...</p>
+      )}
+    </div>
+  );
 };
