@@ -32,11 +32,8 @@ const sortServersByPriority = (list) => {
 };
 
 // Function to generate the Fast server URL
-const getFastServerUrl = (serverName, epId) => {
-  if (serverName === "Fast") {
-    return `https://megaplay.buzz/stream/s-2/${epId}/sub`; // Embed Fast server URL here
-  }
-  return null;
+const getFastServerUrl = (epId) => {
+  return `https://megaplay.buzz/stream/s-2/${epId}/sub`; // Embed Fast server URL here
 };
 
 export const useWatch = (animeId, initialEpisodeId) => {
@@ -244,12 +241,11 @@ export const useWatch = (animeId, initialEpisodeId) => {
           return;
         }
 
-        // Get the Fast server URL if the server is Fast
-        const fastServerUrl = getFastServerUrl(server.serverName, episodeId);
+        // Check if Fast server is selected
+        const fastServerUrl = getFastServerUrl(episodeId);
 
-        // If we have a Fast server URL, set it to the stream URL
         if (fastServerUrl) {
-          setStreamUrl(fastServerUrl);
+          setStreamUrl(fastServerUrl); // Set Fast server URL for streaming
         } else {
           const data = await getStreamInfo(
             animeId,
@@ -337,19 +333,21 @@ export const useWatch = (animeId, initialEpisodeId) => {
 export const WatchPage = ({ animeId, initialEpisodeId }) => {
   const { streamUrl, error } = useWatch(animeId, initialEpisodeId);
 
-  return React.createElement(
-    "div",
-    null,
-    error ? React.createElement("p", null, error) : null,
-    streamUrl
-      ? React.createElement("iframe", {
-          src: streamUrl,
-          width: "100%",
-          height: "100%",
-          frameBorder: "0",
-          scrolling: "no",
-          allowFullScreen: true,
-        })
-      : React.createElement("p", null, "Loading Fast Server...")
+  return (
+    <div>
+      {error && <p>{error}</p>}
+      {streamUrl ? (
+        <iframe
+          src={streamUrl}
+          width="100%"
+          height="100%"
+          frameBorder="0"
+          scrolling="no"
+          allowFullScreen
+        />
+      ) : (
+        <p>Loading Fast Server...</p>
+      )}
+    </div>
   );
 };
