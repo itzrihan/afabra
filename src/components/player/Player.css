@@ -1,0 +1,152 @@
+/* ── Base ──────────────────────────────────────────────────────────────────── */
+#jw_player_container {
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden;
+  background-color: #000;
+  position: absolute;
+  inset: 0;
+}
+
+/* ── Progress bar colour ───────────────────────────────────────────────────── */
+.jw-slider-time .jw-progress {
+  background: #0088CC !important;
+  box-shadow: 0 0 10px rgba(0, 136, 204, 0.5) !important;
+}
+
+.jw-slider-time .jw-buffer {
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+.jw-slider-time .jw-rail {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ── Thumbnail preview ─────────────────────────────────────────────────────── */
+.jw-tooltip-thumbnail,
+.jw-slider-time .jw-tooltip-thumbnail,
+.jw-slider-time .jw-preview,
+.jw-slider-time .jw-thumb {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 99999 !important;
+}
+
+/* ── Icon colours ──────────────────────────────────────────────────────────── */
+#jw_player_container .jw-button-color:not(.jw-icon-cast) {
+  color: gainsboro;
+}
+
+.jw-icon-play  { fill: #ddd !important; }
+.jw-icon-pause { fill: #ddd !important; }
+.jw-icon-fullscreen,
+.jw-icon-volume,
+.jw-icon-settings { fill: #ddd !important; }
+
+/* ── Skip buttons ──────────────────────────────────────────────────────────── */
+.jw-skip-container {
+  position: absolute;
+  bottom: 90px;
+  right: 10px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.jw-skip-btn {
+  cursor: pointer;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 2px solid #fdd253;
+  border-radius: 5px;
+  padding: 10px 15px;
+  margin: 5px;
+  font-size: 1rem;
+  display: none;
+  transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+  backdrop-filter: blur(5px);
+  z-index: 9999;
+  pointer-events: all;
+}
+
+.jw-skip-btn:hover {
+  background-color: #fdd253;
+  color: #000;
+}
+
+#jw-skip-outro {
+  border-color: #ff545c;
+}
+
+#jw-skip-outro:hover {
+  background-color: #ff545c;
+  color: #fff;
+}
+
+/* ── Logo overlay ──────────────────────────────────────────────────────────── */
+.jw-logo-overlay {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.5s ease-out;
+}
+
+.jw-logo-overlay img {
+  width: 35px;
+  height: auto;
+}
+
+/* ── Landscape message ─────────────────────────────────────────────────────── */
+.jw-landscape-msg {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 100000;
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.jw-landscape-msg.hidden {
+  display: none !important;
+}
+
+/* ── Mobile orientation ────────────────────────────────────────────────────── */
+@media (orientation: landscape) {
+  .jw-controlbar {
+    display: flex;
+    justify-content: flex-end !important;
+    padding-right: 20px !important;
+  }
+  .jw-button-container {
+    margin-left: auto !important;
+    order: 2 !important;
+  }
+  .jw-display-icon-next,
+  .jw-display-icon-rewind {
+    display: none !important;
+  }
+}
+
+@media (orientation: portrait) {
+  .jw-controlbar { justify-content: center !important; }
+  .jw-button-container { margin-left: 0 !important; }
+}
+
+@media only screen and (max-width: 768px) {
+  .jw-skip-container { bottom: 80px; }
+  .jw-skip-btn { font-size: 0.9rem; padding: 8px 12px; }
+}
