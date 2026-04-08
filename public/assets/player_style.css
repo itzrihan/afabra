@@ -1,0 +1,111 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+}
+#codenine_player {
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden;
+  background-color: #000;
+}
+
+
+/* jwplayer-custom.css */
+.jw-icon-play {
+    fill: #ddd !important; /* Change play icon color */
+}
+
+.jw-icon-pause {
+    fill: #ddd !important; /* Change pause icon color */
+}
+
+/* Other icon customizations */
+.jw-icon-fullscreen,
+.jw-icon-volume,
+.jw-icon-settings {
+    fill: #ddd !important; /* Change fullscreen, volume, and settings icon color */
+}
+
+#loader-wrapper {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1000;
+	background: #0c111f
+}
+
+.overflow, .circle-line {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.overflow {
+    z-index: 9998;
+    width: 100vw;
+    height: 100vh;
+}
+
+.circle-line {
+    z-index: 9999;
+    width: 150px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.circle-blue,.circle-red,.circle-green,.circle-yellow{
+    position: relative;
+    width: 20px;
+    height: 20px;
+    border-radius: 50px;
+    margin: 8px;
+}
+
+.circle-blue {
+    background-color: #0F90FA;
+    animation: movingUp 0.5s infinite alternate;
+  
+}
+
+.circle-red {
+    background-color: #E62E1E;
+    animation: movingUp 0.5s 0.2s infinite alternate;
+   
+}
+
+.circle-green {
+    background-color: #34A853;
+    animation: movingUp 0.5s .5s infinite alternate;
+    
+  
+}
+
+.circle-yellow {
+    background-color: #FBBC04;
+    animation: movingUp 0.5s .7s infinite alternate;
+    
+}
+
+/* CSS ANIMATION */
+
+@keyframes movingUp {
+    from {
+    
+        top: 0px;
+        
+    }
+
+    to {
+        
+        top: -30px;
+    }
+}
+
+#codenine_player .jw-button-color:not(.jw-icon-cast){
+    color: gainsboro;
+}
