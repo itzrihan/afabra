@@ -315,29 +315,7 @@ export default function Watch() {
                     />
                   )
                 ) : (
-                  <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-50">
-                    <BouncingLoader />
-                  </div>
-                )}
-
-                <p className="text-center underline font-medium text-[15px] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                  {!buffering && !streamInfo ? (
-                    servers ? (
-                      <>
-                        Probably this server is down, try other servers
-                        <br />
-                        Either reload or try again after sometime
-                      </>
-                    ) : (
-                      <>
-                        Probably streaming server is down
-                        <br />
-                        Either reload or try again after sometime
-                      </>
-                    )
-                  ) : null}
-                </p>
-              </div>
+                 
 
               {!buffering && (
                 <Watchcontrols
