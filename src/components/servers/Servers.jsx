@@ -14,6 +14,7 @@ function Servers({
   activeEpisodeNum,
   activeServerId,
   setActiveServerId,
+  setActiveServerName,
   serverLoading,
 }) {
   const subServers = servers?.filter((server) => server.type === "sub") || [];
@@ -40,6 +41,7 @@ function Servers({
 
   const handleServerSelect = (server) => {
     setActiveServerId(server.data_id);
+    if (setActiveServerName) setActiveServerName(server.serverName);
     localStorage.setItem("server_name", server.serverName);
     localStorage.setItem("server_type", server.type);
   };
