@@ -284,69 +284,34 @@ export default function Watch() {
 
             <div className="player w-full h-fit bg-black flex flex-col">
               <div className="w-full relative h-[480px] max-[1400px]:h-[40vw] max-[1200px]:h-[48vw] max-[1024px]:h-[58vw] max-[600px]:h-[65vw]">
-                {!buffering ? (
-                  activeServerName === "Fast" && streamUrl ? (
-                    <iframe
-                      src={streamUrl}
-                      width="100%"
-                      height="100%"
-                      frameBorder="0"
-                      scrolling="no"
-                      allowFullScreen
-                      allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-                      style={{ position: "absolute", inset: 0 }}
-                    />
-                  ) : (
-                    <div className="absolute inset-0">
-                      <Player
-                        streamUrl={streamUrl}
-                        subtitles={subtitles}
-                        intro={intro}
-                        outro={outro}
-                        thumbnail={thumbnail}
-                        autoSkipIntro={autoSkipIntro}
-                        autoPlay={autoPlay}
-                        autoNext={autoNext}
-                        episodeId={episodeId}
-                        episodes={episodes}
-                        playNext={(id) => setEpisodeId(id)}
-                        animeInfo={animeInfo}
-                        episodeNum={activeEpisodeNum}
-                        streamInfo={streamInfo}
-                      />
-                      {/* Skip intro / outro buttons rendered over JW Player */}
-                      <div className="jw-skip-container">
-                        <span
-                          className="jw-skip-btn"
-                          id="jw-skip-intro"
-                          onClick={() => {
-                            const p = window.jwplayer && window.jwplayer("jw_player_container");
-                            if (p) p.seek(intro?.end ?? 0);
-                          }}
-                        >
-                          ⏭ Skip Intro
-                        </span>
-                        <span
-                          className="jw-skip-btn"
-                          id="jw-skip-outro"
-                          onClick={() => {
-                            const p = window.jwplayer && window.jwplayer("jw_player_container");
-                            if (p) p.seek(outro?.end ?? 0);
-                          }}
-                        >
-                          ⏭ Skip Outro
-                        </span>
-                      </div>
-                    </div>
-                  )
-                ) : (
+                {buffering ? (
                   <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-50">
                     <BouncingLoader />
                   </div>
+                ) : (
+                  <Player
+                    key={activeServerId}
+                    isFastServer={activeServerName === "Fast"}
+                    fastServerUrl={streamUrl}
+                    streamUrl={streamUrl}
+                    subtitles={subtitles}
+                    intro={intro}
+                    outro={outro}
+                    thumbnail={thumbnail}
+                    autoSkipIntro={autoSkipIntro}
+                    autoPlay={autoPlay}
+                    autoNext={autoNext}
+                    episodeId={episodeId}
+                    episodes={episodes}
+                    playNext={(id) => setEpisodeId(id)}
+                    animeInfo={animeInfo}
+                    episodeNum={activeEpisodeNum}
+                    streamInfo={streamInfo}
+                  />
                 )}
 
                 <p className="text-center underline font-medium text-[15px] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                  {!buffering && !streamUrl && activeServerName !== "Fast" ? (
+                  {!buffering && !streamUrl ? (
                     servers ? (
                       <>
                         Probably this server is down, try other servers
@@ -384,6 +349,7 @@ export default function Watch() {
                 activeEpisodeNum={activeEpisodeNum}
                 activeServerId={activeServerId}
                 setActiveServerId={setActiveServerId}
+                setActiveServerName={setActiveServerName}
                 serverLoading={serverLoading}
               />
 
